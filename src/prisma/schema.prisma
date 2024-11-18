@@ -1,0 +1,65 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum OnboardingComponentName {
+  birthDate
+  address
+  aboutMe
+}
+
+
+model User {
+  userId    Int    @id @default(autoincrement()) @map("id")
+  email String @unique
+  password String
+  address String?
+  city String?
+  state String?
+  zip String?
+  birthDate String? @map("birth_date")
+  aboutMe String? @map("about_me")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  userOnboardingSteps UserOnboardingSteps[]
+  
+  @@map("users")
+}
+
+model OnboardingComponent {
+  onboardingComponentId Int @id @default(autoincrement()) @map("id")
+  name OnboardingComponentName @unique @map("name")
+  stepIndex Int @default(2) @map("step_index")
+  isActive Boolean @default(true) @map("is_active")
+
+  userOnboardingSteps UserOnboardingSteps[]
+
+  @@map("onboarding_components")
+}
+
+model UserOnboardingSteps {
+  id Int @id @default(autoincrement())
+  userId Int @map("user_id")
+  onboardingComponentId Int @map("onboarding_component_id")
+  completed Boolean @default(false)
+  completedAt DateTime? @map("completed_at")
+
+  user User @relation(fields: [userId], references: [userId], onDelete: Cascade)
+  onboardingComponent OnboardingComponent @relation(fields: [onboardingComponentId], references: [onboardingComponentId])
+
+  @@unique([userId, onboardingComponentId])
+  @@map("user_onboarding_steps")
+}
+
+model Config {
+  configId Int @id @default(autoincrement()) @map("id")
+  name String @unique @map("name")
+  value String @map("value")
+
+  @@map("config")
+}

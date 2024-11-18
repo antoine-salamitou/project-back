@@ -1,0 +1,1 @@
+export const MY_ONBOARDING_STEP_COUNT = 2;

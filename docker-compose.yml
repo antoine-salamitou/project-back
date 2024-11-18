@@ -1,0 +1,30 @@
+version: "3.8"
+
+services:
+  app:
+    build:
+      context: .
+      target: development # Use development stage with nodemon for hot reloading
+    ports:
+      - "3001:3001"
+    volumes:
+      - .:/usr/src/app # Mounts the project directory for live updates
+      - /usr/src/app/node_modules # Ignores node_modules on host
+    depends_on:
+      - db
+    env_file:
+      - .env.local
+
+  db:
+    image: postgres:15
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: mydatabase
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:
